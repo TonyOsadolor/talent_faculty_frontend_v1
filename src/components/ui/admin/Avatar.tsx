@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 
 interface AvatarProps {
   name: string
@@ -17,19 +17,21 @@ const initials = (name: string) =>
     .join('')
 
 const Avatar: React.FC<AvatarProps> = ({ name, src, size = 36 }) => {
+  const [failed, setFailed] = useState(false)
   const colorClass = palette[name.length % palette.length]
 
-  if (src) {
+  if (src && !failed) {
     return (
       <img
-        src={'../avatar.png'}
+        src={src}
         alt={name}
         style={{ width: size, height: size }}
         className="rounded-full object-cover shrink-0"
+        onError={() => setFailed(true)}
       />
     )
   }
-  
+ 
   return (
     <span
       style={{ width: size, height: size }}

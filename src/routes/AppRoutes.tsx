@@ -36,6 +36,8 @@ import AdminGenerateRoleReport from '../pages/admin/users/GenerateRoleReport.tsx
 import AdminLearnerProfile from '../pages/admin/users/LearnerProfile.tsx'
 import AdminUserProfileRouter from '../pages/admin/users/UserProfileRouter.tsx'
 import AdminNotifications from '../pages/admin/Notifications.tsx'
+import AdminMessages from '../pages/admin/Messages.tsx'
+import AdminReports from '../pages/admin/Reports.tsx'
 import AdminAnnouncements from '../pages/admin/Announcement.tsx'
 import AdminCohorts from '../pages/admin/Cohorts.tsx'
 import AdminProfile from '../pages/admin/Profile.tsx'
@@ -136,6 +138,8 @@ const AppRoutes = () => {
       <Route path="/admin/users/:id/:tab" element={<AdminLearnerProfile />} />
       <Route path="/admin/users/:id" element={<AdminUserProfileRouter />} />
       <Route path="/admin/notifications" element={<AdminNotifications />} />
+      <Route path="/admin/messages" element={<AdminMessages />} />
+      <Route path="/admin/reports" element={<AdminReports />} />
       <Route path="/admin/announcements" element={<AdminAnnouncements />} />
       <Route path="/admin/cohorts" element={<AdminCohorts />} />
       <Route path="/admin/certificates" element={<AdminCertificates />} />

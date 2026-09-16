@@ -30,6 +30,7 @@ import AdminUsers from '../pages/admin/Users.tsx'
 import AdminNotifications from '../pages/admin/Notifications.tsx'
 import AdminAnnouncements from '../pages/admin/Announcement.tsx'
 import AdminCohorts from '../pages/admin/Cohorts.tsx'
+import AdminProfile from '../pages/admin/profile.tsx'
 import InSignup6 from '../pages/auth/instructor/Signup6.tsx'
 import InPasswordReset from '../pages/auth/instructor/PasswordReset.tsx'
 import InSignup9 from '../pages/auth/instructor/Signup9.tsx'
@@ -122,6 +123,7 @@ const AppRoutes = () => {
       <Route path="/admin/certificates/:id/edit" element={<EditCertificate />} />
       <Route path="/admin/certificates/generate" element={<GenerateCertificate />} />
       <Route path="/admin/certificates/reports" element={<GenerateCertificatesReport />} />
+      <Route path="/admin/profile" element={<AdminProfile /> }/>
 
       {/* Admin sign in flow */}
       <Route path="/admin/signin" element={<AdminSignin />} />

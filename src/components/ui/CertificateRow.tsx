@@ -20,7 +20,7 @@ const CertificateRow: React.FC<CertificateRowProps> = ({
       <div className="flex items-center gap-4 flex-1 min-w-0">
         <div className="h-16 w-16 rounded-lg bg-neutral-100 flex-shrink-0 overflow-hidden">
           <img
-            src="/course-image.jpg"
+            src={certificate.image_url || '/course-image.jpg'}
             alt={certificate.title}
             className="h-full w-full object-cover"
           />

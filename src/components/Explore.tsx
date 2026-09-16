@@ -229,4 +229,4 @@ const LearningPaths = () => {
     );
 };
 
-export default LearningPaths;
+export default LearningPaths;

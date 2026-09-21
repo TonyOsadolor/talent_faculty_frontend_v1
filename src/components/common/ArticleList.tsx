@@ -11,7 +11,7 @@ const articles = [
 const ArticleList = () => {
   return (
     <div className="rounded-xl border border-gray-200 bg-white p-6">
-      <h2 className="text-lg font-semibold mb-5">
+      <h2 className="text-lg font-semibold text-black mb-5">
         Popular Articles
       </h2>
 

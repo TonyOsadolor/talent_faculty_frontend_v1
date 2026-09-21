@@ -21,7 +21,6 @@ export default function App() {
       <CalltoAction />
       <Name />
       <TestimonialsSection />
-      <PricingSection />
       <FaqSection />
       <Footer />
     </div>

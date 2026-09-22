@@ -1,4 +1,4 @@
-import  { useState } from "react";
+import React, { useMemo, useState } from 'react'
 import {
   ClipboardList,
   UserRound,
@@ -7,299 +7,297 @@ import {
   BarChart3,
   Archive,
   Trash2,
-  Circle,
-} from "lucide-react";
+  CheckCircle2,
+} from 'lucide-react'
+
 import AdminDashboardLayout from '../../components/layout/admin/layout/AdminDashboardLayout'
+import Pagination from '../../components/ui/admin/Pagination'
+import ConfirmActionModal from '../../components/modals/ConfirmActionModal'
+import { notifications as initialNotifications } from '../../data/adminNotifications'
+import type { AdminNotification, NotificationKind } from '../../data/adminNotifications'
 
-const notifications = [
-  {
-    icon: ClipboardList,
-    bg: "bg-orange-50",
-    color: "text-orange-400",
-    title: "23 Assignments waiting review",
-    description: "You have 23 assignments waiting for your review",
-    date: "Today",
-    time: "10:30 am",
-    unread: true,
-  },
-  {
-    icon: UserRound,
-    bg: "bg-blue-50",
-    color: "text-blue-400",
-    title: "18 new users registrations",
-    description: "18 new users have registered in the plat form",
-    date: "Today",
-    time: "6:00 am",
-    unread: true,
-  },
-  {
-    icon: BookOpen,
-    bg: "bg-green-50",
-    color: "text-green-400",
-    title: "Course Approval request",
-    description: "5 courses are waiting for your approval",
-    date: "Yesterday",
-    time: "8:00 pm",
-    unread: true,
-  },
-  {
-    icon: BookOpen,
-    bg: "bg-green-50",
-    color: "text-green-400",
-    title: "New course published",
-    description: "New course Advanced react development has be..",
-    date: "Yesterday",
-    time: "4:00 pm",
-    unread: false,
-  },
-  {
-    icon: Megaphone,
-    bg: "bg-red-50",
-    color: "text-red-400",
-    title: "New announcement published",
-    description: "“Holiday notice”has been published by admin",
-    date: "Two days ago",
-    time: "5:30 am",
-    unread: true,
-  },
-  {
-    icon: BarChart3,
-    bg: "bg-gray-100",
-    color: "text-gray-500",
-    title: "Weekly report is ready",
-    description: "Your weekly LMS report is ready",
-    date: "August 6th 2026",
-    time: "12:12 pm",
-    unread: false,
-  },
-];
+type TabKey = 'all' | 'pending' | 'unread' | 'mentions' | 'messages' | 'archived'
 
-const tabs = [
-  "All",
-  "Pending Tasks (34)",
-  "Unread (10)",
-  "Mentions (23)",
-  "Messages (10)",
-  "Archived (23)",
-];
+const kindStyles: Record<NotificationKind, { icon: React.ReactNode; bg: string; text: string }> = {
+  task: { icon: <ClipboardList size={20} strokeWidth={1.5} />, bg: 'bg-admin-warning-light', text: 'text-admin-secondary' },
+  registration: { icon: <UserRound size={20} strokeWidth={1.5} />, bg: 'bg-admin-info-light', text: 'text-admin-info' },
+  course: { icon: <BookOpen size={20} strokeWidth={1.5} />, bg: 'bg-admin-success-light', text: 'text-admin-success' },
+  announcement: { icon: <Megaphone size={20} strokeWidth={1.5} />, bg: 'bg-admin-danger-light', text: 'text-admin-danger' },
+  report: { icon: <BarChart3 size={20} strokeWidth={1.5} />, bg: 'bg-admin-ash-7', text: 'text-admin-ash-3' },
+  message: { icon: null, bg: '', text: '' },
+}
+
+type ActionModalState = { type: 'archive' | 'delete'; item: AdminNotification } | null
+
+const PAGE_SIZE = 6
 
 export default function Notifications() {
-  const [activeTab, setActiveTab] = useState("All");
-  const [selected, setSelected] = useState<number[]>([]);
+  const [notifications, setNotifications] = useState<AdminNotification[]>(initialNotifications)
+  const [activeTab, setActiveTab] = useState<TabKey>('all')
+  const [selected, setSelected] = useState<string[]>([])
+  const [page, setPage] = useState(1)
+  const [pageSize, setPageSize] = useState(PAGE_SIZE)
+  const [actionModal, setActionModal] = useState<ActionModalState>(null)
+  const [toast, setToast] = useState<string | null>(null)
 
-  const toggleSelect = (index: number) => {
-    setSelected((prev) =>
-      prev.includes(index)
-        ? prev.filter((item) => item !== index)
-        : [...prev, index]
-    );
-  };
+  const showToast = (message: string) => {
+    setToast(message)
+    setTimeout(() => setToast(null), 3000)
+  }
+
+  const counts = useMemo(
+    () => ({
+      all: notifications.filter((n) => !n.archived).length,
+      pending: notifications.filter((n) => n.pendingTask && !n.archived).length,
+      unread: notifications.filter((n) => n.unread && !n.archived).length,
+      mentions: notifications.filter((n) => n.mention && !n.archived).length,
+      messages: notifications.filter((n) => n.kind === 'message' && !n.archived).length,
+      archived: notifications.filter((n) => n.archived).length,
+    }),
+    [notifications]
+  )
+
+  const tabs: { key: TabKey; label: string }[] = [
+    { key: 'all', label: `All` },
+    { key: 'pending', label: `Pending Tasks (${counts.pending})` },
+    { key: 'unread', label: `Unread (${counts.unread})` },
+    { key: 'mentions', label: `Mentions (${counts.mentions})` },
+    { key: 'messages', label: `Messages (${counts.messages})` },
+    { key: 'archived', label: `Archived (${counts.archived})` },
+  ]
+
+  const filtered = useMemo(() => {
+    return notifications.filter((n) => {
+      if (activeTab === 'all') return !n.archived
+      if (activeTab === 'pending') return n.pendingTask && !n.archived
+      if (activeTab === 'unread') return n.unread && !n.archived
+      if (activeTab === 'mentions') return n.mention && !n.archived
+      if (activeTab === 'messages') return n.kind === 'message' && !n.archived
+      return n.archived
+    })
+  }, [notifications, activeTab])
+
+  const totalPages = Math.max(1, Math.ceil(filtered.length / pageSize))
+  const currentPage = Math.min(page, totalPages)
+  const pageStart = (currentPage - 1) * pageSize
+  const pageRows = filtered.slice(pageStart, pageStart + pageSize)
+
+  const allOnPageSelected = pageRows.length > 0 && pageRows.every((r) => selected.includes(r.id))
 
   const toggleAll = () => {
-    if (selected.length === notifications.length) {
-      setSelected([]);
+    if (allOnPageSelected) {
+      setSelected((prev) => prev.filter((id) => !pageRows.some((r) => r.id === id)))
     } else {
-      setSelected(notifications.map((_, index) => index));
+      setSelected((prev) => Array.from(new Set([...prev, ...pageRows.map((r) => r.id)])))
     }
-  };
+  }
 
- return (
-  <AdminDashboardLayout>
-    <div className="-mt-[1px] min-h-screen w-full bg-white">
-      
-      <div className="pt-[14px]">
-        <h1 className="text-[17px] font-semibold text-[#087b38]">
-          Notifications
-        </h1>
+  const toggleOne = (id: string) => {
+    setSelected((prev) => (prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]))
+  }
 
-        <p className="mt-[5px] text-[12px] text-[#8a8a8a]">
-          Stay updated with important activities and alerts.
-        </p>
-      </div>
+  const handleRowClick = (id: string) => {
+    setNotifications((prev) => prev.map((n) => (n.id === id ? { ...n, unread: false } : n)))
+  }
 
-        {/* ================= TABS ================= */}
-        <div className="mt-[37px] flex h-[43px] items-start">
+  const handleConfirmAction = () => {
+    if (!actionModal) return
+    const { type, item } = actionModal
 
+    /**
+     * Backend Integration
+     *
+     * type === 'archive'
+     *   ? await notificationService.archiveNotification(item.id)
+     *   : await notificationService.deleteNotification(item.id)
+     */
+
+    if (type === 'archive') {
+      setNotifications((prev) => prev.map((n) => (n.id === item.id ? { ...n, archived: true } : n)))
+      showToast('Notification archived.')
+    } else {
+      setNotifications((prev) => prev.filter((n) => n.id !== item.id))
+      showToast('Notification deleted.')
+    }
+
+    setSelected((prev) => prev.filter((id) => id !== item.id))
+    setActionModal(null)
+  }
+
+  return (
+    <AdminDashboardLayout
+      title="Notifications"
+      subtitle="Stay updated with important activities and alerts."
+    >
+      <div className="max-w-[1400px] w-full mx-auto space-y-6 relative">
+        {toast && (
+          <div className="fixed top-6 right-6 z-[110] flex items-center gap-2.5 rounded-xl border border-admin-ash-7 bg-white px-4 py-3 shadow-lg animate-fade-in">
+            <CheckCircle2 size={20} className="text-admin-primary shrink-0" />
+            <p className="text-sm text-admin-ash-1">{toast}</p>
+          </div>
+        )}
+
+        {/* Tabs */}
+        <div className="flex gap-10 border-b border-admin-ash-7 text-sm font-semibold overflow-x-auto">
           {tabs.map((tab) => (
             <button
-              key={tab}
-              onClick={() => setActiveTab(tab)}
-              className={`relative mr-[47px] h-[43px] whitespace-nowrap text-[15px] font-semibold ${
-                activeTab === tab
-                  ? "text-[#087b38]"
-                  : "text-[#858585]"
+              key={tab.key}
+              onClick={() => {
+                setActiveTab(tab.key)
+                setPage(1)
+              }}
+              className={`pb-3 border-b-[3px] whitespace-nowrap transition-colors ${
+                activeTab === tab.key
+                  ? 'border-admin-primary text-admin-primary'
+                  : 'border-transparent text-admin-ash-3 hover:text-admin-ash-1'
               }`}
             >
-              {tab}
-
-              {activeTab === tab && (
-                <span className="absolute bottom-0 left-[-4px] h-[1px] w-[51px] bg-[#087b38]" />
-              )}
+              {tab.label}
             </button>
           ))}
-
         </div>
 
-        {/* ================= TABLE ================= */}
-        <div className="mt-[32px] w-full">
+        {/* Table */}
+        <div className="bg-white overflow-x-auto border border-admin-ash-7 rounded-xl">
+          <table className="w-full min-w-[860px] border-collapse text-left">
+            <thead>
+              <tr className="bg-admin-ash-7/40 border-b border-admin-ash-7">
+                <th className="px-5 py-3.5 w-10">
+                  <input
+                    type="checkbox"
+                    checked={allOnPageSelected}
+                    onChange={toggleAll}
+                    className="h-4 w-4 rounded accent-admin-primary"
+                  />
+                </th>
+                <th className="px-3 py-3.5 text-sm font-semibold text-admin-ink">Alert</th>
+                <th className="px-3 py-3.5 text-sm font-semibold text-admin-ink">Date</th>
+                <th className="px-3 py-3.5 text-sm font-semibold text-admin-ink">Status</th>
+                <th className="px-3 pr-5 py-3.5 text-sm font-semibold text-admin-ink">Actions</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-admin-ash-7">
+              {pageRows.map((item) => {
+                const style = kindStyles[item.kind]
+                const muted = item.archived
 
-          {/* Header */}
-          <div className="grid h-[59px] grid-cols-[58px_minmax(0,1fr)_148px_100px_96px] items-center bg-[#f3f3f3]">
-
-            <div className="flex justify-center">
-              <button
-                onClick={toggleAll}
-                className={`h-[16px] w-[16px] border ${
-                  selected.length === notifications.length
-                    ? "border-[#087b38] bg-[#087b38]"
-                    : "border-[#d4d4d4] bg-[#dedede]"
-                }`}
-              />
-            </div>
-
-            <span className="text-[14px] font-medium">
-              Alert
-            </span>
-
-            <span className="text-[14px] font-medium">
-              Date
-            </span>
-
-            <span className="text-[14px] font-medium">
-              Status
-            </span>
-
-            <span className="text-[14px] font-medium">
-              Actions
-            </span>
-          </div>
-
-          {/* Notification rows */}
-          <div className="mt-[12px] flex flex-col gap-[12px]">
-
-            {notifications.map((item, index) => {
-              const Icon = item.icon;
-
-              return (
-                <div
-                  key={item.title}
-                  className="grid h-[60px] grid-cols-[58px_minmax(0,1fr)_148px_100px_96px] items-center border border-[#ededed] bg-white"
-                >
-
-                  {/* Checkbox */}
-                  <div className="flex justify-center">
-                    <button
-                      onClick={() => toggleSelect(index)}
-                      className={`h-[16px] w-[16px] border ${
-                        selected.includes(index)
-                          ? "border-[#087b38] bg-[#087b38]"
-                          : "border-[#d4d4d4] bg-[#dedede]"
-                      }`}
-                    />
-                  </div>
-
-                  {/* Alert */}
-                  <div className="flex min-w-0 items-center gap-[11px]">
-
-                    <div
-                      className={`flex h-[44px] w-[44px] shrink-0 items-center justify-center rounded-full ${item.bg}`}
-                    >
-                      <Icon
-                        size={21}
-                        strokeWidth={1.5}
-                        className={item.color}
+                return (
+                  <tr
+                    key={item.id}
+                    onClick={() => handleRowClick(item.id)}
+                    className={`cursor-pointer transition-colors ${muted ? 'opacity-60' : 'hover:bg-admin-ash-7/20'}`}
+                  >
+                    <td className="px-5 py-3.5" onClick={(e) => e.stopPropagation()}>
+                      <input
+                        type="checkbox"
+                        checked={selected.includes(item.id)}
+                        onChange={() => toggleOne(item.id)}
+                        className="h-4 w-4 rounded accent-admin-primary"
                       />
-                    </div>
+                    </td>
+                    <td className="px-3 py-3.5">
+                      <div className="flex items-center gap-3 min-w-[260px]">
+                        {item.kind === 'message' ? (
+                          <img
+                            src={item.avatar}
+                            alt={item.title}
+                            className="h-11 w-11 rounded-full object-cover shrink-0"
+                          />
+                        ) : (
+                          <span
+                            className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-full ${muted ? 'bg-admin-ash-7 text-admin-ash-4' : `${style.bg} ${style.text}`}`}
+                          >
+                            {style.icon}
+                          </span>
+                        )}
+                        <div className="min-w-0">
+                          <p className={`text-sm font-semibold truncate ${muted ? 'text-admin-ash-3' : 'text-admin-ink'}`}>
+                            {item.title}
+                          </p>
+                          <p className="text-xs text-admin-ash-3 truncate">{item.description}</p>
+                        </div>
+                      </div>
+                    </td>
+                    <td className="px-3 py-3.5">
+                      <p className="text-sm text-admin-ash-1">{item.date}</p>
+                      <p className="text-xs text-admin-ash-3">{item.time}</p>
+                    </td>
+                    <td className="px-3 py-3.5">
+                      {item.unread && !item.archived && (
+                        <span className="block h-2 w-2 rounded-full bg-admin-info" />
+                      )}
+                    </td>
+                    <td className="px-3 pr-5 py-3.5" onClick={(e) => e.stopPropagation()}>
+                      <div className="flex items-center gap-3">
+                        {!item.archived && (
+                          <button
+                            onClick={() => setActionModal({ type: 'archive', item })}
+                            className="text-admin-secondary hover:opacity-70 transition-opacity"
+                            title="Archive"
+                          >
+                            <Archive size={17} strokeWidth={1.5} />
+                          </button>
+                        )}
+                        <button
+                          onClick={() => setActionModal({ type: 'delete', item })}
+                          className="text-admin-danger hover:opacity-70 transition-opacity"
+                          title="Delete"
+                        >
+                          <Trash2 size={17} strokeWidth={1.5} />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                )
+              })}
 
-                    <div className="min-w-0">
-                      <p className="truncate text-[14px] font-semibold leading-[19px] text-[#222]">
-                        {item.title}
-                      </p>
-
-                      <p className="truncate text-[12px] leading-[17px] text-[#747474]">
-                        {item.description}
-                      </p>
-                    </div>
-
-                  </div>
-
-                  {/* Date */}
-                  <div>
-                    <p className="text-[14px] font-medium text-[#555]">
-                      {item.date}
-                    </p>
-
-                    <p className="mt-[2px] text-[12px] text-[#777]">
-                      {item.time}
-                    </p>
-                  </div>
-
-                  {/* Status */}
-                  <div>
-                    {item.unread && (
-                      <Circle
-                        size={8}
-                        fill="#4388ed"
-                        strokeWidth={0}
-                        className="text-[#4388ed]"
-                      />
-                    )}
-                  </div>
-
-                  {/* Actions */}
-                  <div className="flex items-center gap-[13px]">
-
-                    <button className="text-[#ffad24] hover:scale-110">
-                      <Archive
-                        size={17}
-                        strokeWidth={1.5}
-                      />
-                    </button>
-
-                    <button className="text-[#ff4b43] hover:scale-110">
-                      <Trash2
-                        size={17}
-                        strokeWidth={1.5}
-                      />
-                    </button>
-
-                  </div>
-
-                </div>
-              );
-            })}
-
-          </div>
-
-          {/* ================= PAGINATION ================= */}
-          <div className="mt-[31px] flex items-center justify-center gap-[10px]">
-
-            <button className="h-[32px] w-[32px] rounded-[7px] border border-gray-300 text-gray-500">
-              ‹
-            </button>
-
-            {[1, 2, 3, 4, 5].map((page) => (
-              <button
-                key={page}
-                className={`h-[32px] w-[32px] rounded-[7px] border text-[12px] ${
-                  page === 1
-                    ? "border-[#4b92ff] text-[#4b92ff]"
-                    : "border-gray-300 text-gray-500"
-                }`}
-              >
-                {page}
-              </button>
-            ))}
-
-            <button className="h-[32px] w-[32px] rounded-[7px] border border-gray-300 text-gray-500">
-              ›
-            </button>
-
-          </div>
-
+              {pageRows.length === 0 && (
+                <tr>
+                  <td colSpan={5} className="px-5 py-12 text-center text-sm text-admin-ash-3">
+                    No notifications here.
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
         </div>
-      
-        </div>
+
+        <Pagination
+          page={currentPage}
+          totalPages={totalPages}
+          onPageChange={setPage}
+          showingFrom={filtered.length === 0 ? 0 : pageStart + 1}
+          showingTo={Math.min(pageStart + pageSize, filtered.length)}
+          totalCount={filtered.length}
+          pageSize={pageSize}
+          onPageSizeChange={(size) => {
+            setPageSize(size)
+            setPage(1)
+          }}
+        />
+      </div>
+
+      <ConfirmActionModal
+        open={actionModal?.type === 'archive'}
+        tone="warning"
+        title="Are You Sure?"
+        description="You are about to archive this notification. Archived items can be recovered!"
+        confirmLabel="Yes, Archive!"
+        cancelLabel="No, Go Back"
+        onConfirm={handleConfirmAction}
+        onCancel={() => setActionModal(null)}
+      />
+
+      <ConfirmActionModal
+        open={actionModal?.type === 'delete'}
+        tone="danger"
+        title="Are You Sure?"
+        description="You are about to permanently delete this notification. Deleted items cannot be recovered!"
+        confirmLabel="Yes, Delete!"
+        cancelLabel="No, Go Back"
+        onConfirm={handleConfirmAction}
+        onCancel={() => setActionModal(null)}
+      />
     </AdminDashboardLayout>
-  );
+  )
 }

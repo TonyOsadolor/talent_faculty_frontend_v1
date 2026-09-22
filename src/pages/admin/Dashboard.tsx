@@ -1,4 +1,5 @@
-import React from 'react'
+import React, { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import {
   Users, BookOpen, GraduationCap, Contact, UsersRound,
   Layers, Award, ClipboardList, ClipboardCheck,
@@ -10,6 +11,7 @@ import ActivityCard from '../../components/ui/admin/ActivityCard'
 import QuickLinkButton from '../../components/ui/admin/QuickLinkButton'
 import ListRow from '../../components/ui/admin/ListRow'
 import Card from '../../components/common/admin/Card'
+import DashboardReportModal, { type DashboardReportType } from '../../components/ui/admin/DashboardReportModal'
 
 const adminName = 'Samuel'
 
@@ -38,10 +40,10 @@ const platformActivities = [
 ]
 
 const quickLinks = [
-  { label: 'Add User', tone: 'blue' as const, icon: <UserPlus size={20} /> },
-  { label: 'Create Cohort', tone: 'purple' as const, icon: <UsersRound size={20} /> },
-  { label: 'Create Announcemnet', tone: 'orange' as const, icon: <Megaphone size={20} /> },
-  { label: 'Generate Report', tone: 'blue' as const, icon: <ChartColumnBig size={20} /> },
+  { key: 'add-user' as const, label: 'Add User', tone: 'blue' as const, icon: <UserPlus size={20} /> },
+  { key: 'create-cohort' as const, label: 'Create Cohort', tone: 'purple' as const, icon: <UsersRound size={20} /> },
+  { key: 'create-announcement' as const, label: 'Create Announcemnet', tone: 'orange' as const, icon: <Megaphone size={20} /> },
+  { key: 'generate-report' as const, label: 'Generate Report', tone: 'blue' as const, icon: <ChartColumnBig size={20} /> },
 ]
 
 const recentActivities = [
@@ -64,6 +66,40 @@ const SeeAllLink: React.FC = () => (
 )
 
 const Dashboard: React.FC = () => {
+  const navigate = useNavigate()
+  const [reportModalOpen, setReportModalOpen] = useState(false)
+
+  const reportDestinations: Record<DashboardReportType, string> = {
+    admins: '/admin/users/reports/admins',
+    instructors: '/admin/users/reports/instructors',
+    learners: '/admin/users/reports/learners',
+    cohorts: '/admin/cohorts/report',
+    courses: '/admin/courses/reports',
+    certificates: '/admin/certificates/reports',
+  }
+
+  const handleQuickLink = (key: (typeof quickLinks)[number]['key']) => {
+    switch (key) {
+      case 'add-user':
+        navigate('/admin/users/new')
+        break
+      case 'create-cohort':
+        navigate('/admin/cohorts/new')
+        break
+      case 'create-announcement':
+        navigate('/admin/announcements', { state: { create: true } })
+        break
+      case 'generate-report':
+        setReportModalOpen(true)
+        break
+    }
+  }
+
+  const handleReportContinue = (type: DashboardReportType) => {
+    setReportModalOpen(false)
+    navigate(reportDestinations[type])
+  }
+
   return (
     <AdminDashboardLayout
       title={`${getGreeting()}, ${adminName} \uD83D\uDC4B`}
@@ -93,7 +129,13 @@ const Dashboard: React.FC = () => {
         <Card title="Quick Links" className='text-black'>
           <div className="flex flex-wrap gap-3">
             {quickLinks.map((item) => (
-              <QuickLinkButton key={item.label} {...item} />
+              <QuickLinkButton
+                key={item.label}
+                icon={item.icon}
+                tone={item.tone}
+                label={item.label}
+                onClick={() => handleQuickLink(item.key)}
+              />
             ))}
           </div>
         </Card>
@@ -117,6 +159,12 @@ const Dashboard: React.FC = () => {
           </Card>
         </div>
       </div>
+
+      <DashboardReportModal
+        isOpen={reportModalOpen}
+        onClose={() => setReportModalOpen(false)}
+        onContinue={handleReportContinue}
+      />
     </AdminDashboardLayout>
   )
 }

@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useLocation } from "react-router-dom";
 import {
   Search,
   ChevronDown,
@@ -181,6 +182,7 @@ function getDisplayedStatus(
 }
 
 export default function Announcements() {
+  const location = useLocation();
   const [activeTab, setActiveTab] =
     useState<AnnouncementTab>("All Announcements");
 
@@ -190,7 +192,7 @@ export default function Announcements() {
     useState<Announcement | null>(null);
 
   const [creatingAnnouncement, setCreatingAnnouncement] =
-    useState(false);
+    useState((location.state as { create?: boolean } | null)?.create === true);
 
   const [showArchiveModal, setShowArchiveModal] =
     useState(false);

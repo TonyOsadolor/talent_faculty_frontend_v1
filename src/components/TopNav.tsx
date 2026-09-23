@@ -7,7 +7,7 @@ export default function TopNav() {
 
   const navLinks = [
     { label: 'Home', href: '/' },
-    { label: 'Courses', href: '#footer' },
+    { label: 'Courses', href: '#Explore' },
     { label: 'Features', href: '#' },
     { label: 'Meet The Team', href: '/meet-the-team' },
   ]
@@ -36,11 +36,10 @@ export default function TopNav() {
                   <Link
                     key={link.label}
                     to={link.href}
-                    className={`relative rounded-full px-4 py-2 text-sm font-medium transition-all duration-200 group ${
-                      active
-                        ? 'text-primary bg-green-50 border border-green-200 shadow-2xs font-semibold'
-                        : 'text-neutral-700 hover:text-primary hover:bg-neutral-50'
-                    }`}
+                    className={`relative rounded-full px-4 py-2 text-sm font-medium transition-all duration-200 group ${active
+                      ? 'text-primary bg-green-50 border border-green-200 shadow-2xs font-semibold'
+                      : 'text-neutral-700 hover:text-primary hover:bg-neutral-50'
+                      }`}
                   >
                     <span className="relative z-10">{link.label}</span>
                   </Link>
@@ -112,11 +111,10 @@ export default function TopNav() {
                     key={link.label}
                     to={link.href}
                     onClick={() => setIsOpen(false)}
-                    className={`flex items-center justify-between rounded-xl px-4 py-3 text-base font-medium transition-all ${
-                      active
-                        ? 'text-primary bg-green-50 font-bold'
-                        : 'text-neutral-800 hover:bg-neutral-50'
-                    }`}
+                    className={`flex items-center justify-between rounded-xl px-4 py-3 text-base font-medium transition-all ${active
+                      ? 'text-primary bg-green-50 font-bold'
+                      : 'text-neutral-800 hover:bg-neutral-50'
+                      }`}
                   >
                     <span>{link.label}</span>
                   </Link>

@@ -68,7 +68,7 @@ export default function QuizBuilder() {
 
     const [step, setStep] = useState<Step>("settings");
 
-    // Step 1 — quiz settings
+    // Step 1 Ã¢â‚¬â€ quiz settings
     const [quizTitle, setQuizTitle] = useState("");
     const [quizDescription, setQuizDescription] = useState("");
     const [duration, setDuration] = useState("");
@@ -77,7 +77,7 @@ export default function QuizBuilder() {
     const [showResult, setShowResult] = useState(true);
     const [allowReview, setAllowReview] = useState(true);
 
-    // Step 2 — questions
+    // Step 2 Ã¢â‚¬â€ questions
     const [questions, setQuestions] = useState<Question[]>([]);
     const [expandedId, setExpandedId] = useState<string | null>(null);
     const [openMenuId, setOpenMenuId] = useState<string | null>(null);
@@ -338,7 +338,7 @@ export default function QuizBuilder() {
             <div className="flex flex-col">
                 {questions.length === 0 && (
                     <p className="text-[13px] text-gray-400 text-center py-10">
-                        No questions yet — add one using the buttons above.
+                        No questions yet Ã¢â‚¬â€ add one using the buttons above.
                     </p>
                 )}
 
@@ -358,7 +358,7 @@ export default function QuizBuilder() {
                                         Question {index + 1}
                                         {!isExpanded && q.text && (
                                             <span className="ml-2 font-normal text-gray-500">
-                                                {q.text.length > 60 ? `${q.text.slice(0, 60)}…` : q.text}
+                                                {q.text.length > 60 ? `${q.text.slice(0, 60)}Ã¢â‚¬Â¦` : q.text}
                                             </span>
                                         )}
                                     </span>
@@ -441,7 +441,7 @@ export default function QuizBuilder() {
                                                         <div
                                                             key={opt.id}
                                                             className={`flex items-center text-black gap-2 rounded-lg border px-3 py-2 ${isCorrect
-                                                                ? "border-primary bg-primary-50/40"
+                                                                ? "border-primary bg-primary/40"
                                                                 : "border-gray-200"
                                                                 }`}
                                                         >
@@ -490,7 +490,7 @@ export default function QuizBuilder() {
 
                                     {q.type === "short" && (
                                         <p className="text-[12px] text-gray-500 italic">
-                                            Learners will type a free-text response — no answer options needed.
+                                            Learners will type a free-text response Ã¢â‚¬â€ no answer options needed.
                                         </p>
                                     )}
                                 </div>

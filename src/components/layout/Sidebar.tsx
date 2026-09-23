@@ -16,6 +16,8 @@ interface SidebarProps {
 const mainMenuItems = [
   { label: 'Dashboard', icon: <LayoutDashboard size={20} />, path: '/dashboard' },
   { label: 'My Courses', icon: <BookOpen size={20} />, path: '/courses' },
+  { label: 'Deliverables', icon: <TrendingUp size={20} />, path: '/Deliverables' },
+    { label: 'Group Project', icon: <BookOpen size={20} />, path: '/Group Project' },
   { label: 'Progress', icon: <TrendingUp size={20} />, path: '/progress' },
   { label: 'Assessments', icon: <ClipboardList size={20} />, path: '/assessments' },
   { label: 'Assignments', icon: <FileText size={20} />, path: '/assignments' },

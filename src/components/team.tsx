@@ -74,7 +74,7 @@ const Team = () => {
             img: "/david.png",
             name: 'Product Designer',
             socials: {
-                github: 'www.behance.net/alikadavid',
+                github: 'https://www.behance.net/alikadavid',
                 linkedin: 'www.dribbble.com/davidalika,',
                 instagram: 'www.instagram.com/thedavidalika',
             },

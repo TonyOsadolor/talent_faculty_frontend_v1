@@ -25,7 +25,10 @@ import InstructorDashboard from '../pages/instructor/Dashboard.tsx'
 import CreateCourse from '../pages/instructor/CreateCourse.tsx'
 import InstructorLayout from '../components/layout/instruct/DashboardLayout.tsx'
 import AdminDashboard from '../pages/admin/Dashboard.tsx'
-import AdminCourses from '../pages/admin/Courses.tsx'
+import AdminCourses from '../pages/admin/courses/Courses.tsx'
+import AdminViewCourse from '../pages/admin/courses/ViewCourse.tsx'
+import AdminEditCourse from '../pages/admin/courses/EditCourse.tsx'
+import AdminGenerateCourseReport from '../pages/admin/courses/GenerateCourseReport.tsx'
 import AdminUsers from '../pages/admin/users/Users.tsx'
 import AdminAddEditUser from '../pages/admin/users/AddEditUser.tsx'
 import AdminBulkUploadUsers from '../pages/admin/users/BulkUploadUsers.tsx'
@@ -33,6 +36,8 @@ import AdminGenerateRoleReport from '../pages/admin/users/GenerateRoleReport.tsx
 import AdminLearnerProfile from '../pages/admin/users/LearnerProfile.tsx'
 import AdminUserProfileRouter from '../pages/admin/users/UserProfileRouter.tsx'
 import AdminNotifications from '../pages/admin/Notifications.tsx'
+import AdminMessages from '../pages/admin/Messages.tsx'
+import AdminReports from '../pages/admin/Reports.tsx'
 import AdminAnnouncements from '../pages/admin/Announcement.tsx'
 import AdminCohorts from '../pages/admin/Cohorts.tsx'
 import AdminProfile from '../pages/admin/Profile.tsx'
@@ -120,6 +125,11 @@ const AppRoutes = () => {
       <Route path="/admin" element={<Navigate to="/admin/dashboard" replace />} />
       <Route path="/admin/dashboard" element={<AdminDashboard />} />
       <Route path="/admin/courses" element={<AdminCourses />} />
+      <Route path="/admin/courses/new" element={<AdminEditCourse />} />
+      <Route path="/admin/courses/reports" element={<AdminGenerateCourseReport />} />
+      <Route path="/admin/courses/:id/edit" element={<AdminEditCourse />} />
+      <Route path="/admin/courses/:id/view/:tab" element={<AdminViewCourse />} />
+      <Route path="/admin/courses/:id" element={<AdminViewCourse />} />
       <Route path="/admin/users" element={<AdminUsers />} />
       <Route path="/admin/users/new" element={<AdminAddEditUser />} />
       <Route path="/admin/users/bulk-upload" element={<AdminBulkUploadUsers />} />
@@ -128,6 +138,8 @@ const AppRoutes = () => {
       <Route path="/admin/users/:id/:tab" element={<AdminLearnerProfile />} />
       <Route path="/admin/users/:id" element={<AdminUserProfileRouter />} />
       <Route path="/admin/notifications" element={<AdminNotifications />} />
+      <Route path="/admin/messages" element={<AdminMessages />} />
+      <Route path="/admin/reports" element={<AdminReports />} />
       <Route path="/admin/announcements" element={<AdminAnnouncements />} />
       <Route path="/admin/cohorts" element={<AdminCohorts />} />
       <Route path="/admin/certificates" element={<AdminCertificates />} />

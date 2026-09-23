@@ -109,7 +109,7 @@ function SelectRow({ icon, title, description, value, options, onChange }: Selec
                 <select
                     value={value}
                     onChange={(e) => onChange(e.target.value)}
-                    className="cursor-pointer appearance-none rounded-full border border-gray-200 bg-white py-2 md:pl-4 pl-3 pr-5 md:pr-9 text-xs md:text-sm font-medium text-gray-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-bhgreen-500"
+                    className="cursor-pointer appearance-none rounded-full border border-gray-200 bg-white py-2 md:pl-4 pl-3 pr-5 md:pr-9 text-xs md:text-sm font-medium text-gray-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary"
                 >
                     {options.map((opt) => (
                         <option key={opt} value={opt}>
@@ -366,7 +366,7 @@ function SegmentedControl<T extends string>({
                         type="button"
                         onClick={() => onChange(opt)}
                         className={`rounded-full border px-4 py-1.5 text-sm font-medium transition-colors ${active
-                            ? "border-primary bg-primary text-bhgreen-700"
+                            ? "border-primary bg-primary text-primary"
                             : "border-gray-200 bg-white text-gray-600 hover:bg-gray-50"
                             }`}
                     >
